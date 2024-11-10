@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../utils/api";
 
 function Login() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,7 +16,7 @@ function Login() {
       const response = await api.post("/auth/login", formData);
       localStorage.setItem("token", response.data.token);
       toast.success("Login successful!");
-      navigate("/events");
+      window.location.href = "/events";
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     }

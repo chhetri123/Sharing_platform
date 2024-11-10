@@ -52,6 +52,13 @@ const authController = {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   },
+  isLoggedIn: async (req, res) => {
+    try {
+      res.json({ status: true, user: req.user });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  },
 };
 
 module.exports = authController;

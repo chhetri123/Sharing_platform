@@ -6,7 +6,7 @@ const messageController = require("../controllers/messageController");
 
 router.post("/", auth, eventController.createEvent);
 router.get("/", auth, eventController.getEvents);
-router.get("/unjoined-family", auth, eventController.getUnjoinedFamilyEvents); // Moved up
+router.get("/unjoined", auth, eventController.getUnjoinedFamilyEvents); // Moved up
 
 // Parameterized routes last
 router.get("/:eventId", auth, eventController.getEventDetails);

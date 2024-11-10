@@ -4,18 +4,18 @@ import { MessageSquare, Send, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../utils/api";
 import io from "socket.io-client";
+import { useEvents } from "../context/EventContext";
 
 function EventDetails() {
   const { id } = useParams();
-  const [event, setEvent] = useState(null);
+  const { event, fetchEventDetails } = useEvents();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    fetchEventDetails();
+    fetchEventDetails(id);
     fetchMessages();
-
     // Socket.io setup
     const newSocket = io("http://localhost:3001", {
       auth: {
@@ -36,17 +36,6 @@ function EventDetails() {
 
     return () => newSocket.close();
   }, [id]);
-
-  const fetchEventDetails = async () => {
-    try {
-      const response = await api.get(`/events/${id}`);
-
-      setEvent(await response.data.event);
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to fetch event details");
-    }
-  };
 
   const fetchMessages = async () => {
     try {
@@ -70,7 +59,6 @@ function EventDetails() {
   };
 
   if (!event) return <div>Loading...</div>;
-  console.log(event);
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">

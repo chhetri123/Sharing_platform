@@ -6,5 +6,6 @@ const familyController = require("../controllers/familyController");
 // Make sure we're using the correct property names from the controller
 router.post("/", auth, familyController.addFamilyMember);
 router.get("/", auth, familyController.getFamilyMembers);
+router.delete("/:familyMemberId", auth, familyController.removeFamilyMember);
 
 module.exports = router;

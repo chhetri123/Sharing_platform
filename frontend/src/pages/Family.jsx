@@ -1,46 +1,24 @@
-import { useState, useEffect } from "react";
-import { Users, UserPlus } from "lucide-react";
-import toast from "react-hot-toast";
-import api from "../utils/api";
+import { useState } from "react";
+import { Users, UserPlus, UserMinus, User } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useFamily } from "../context/FamilyContext";
 
 function Family() {
-  const [familyMembers, setFamilyMembers] = useState([]);
   const [email, setEmail] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-
-  useEffect(() => {
-    fetchFamilyMembers();
-  }, []);
-
-  const fetchFamilyMembers = async () => {
-    try {
-      const response = await api.get("/family");
-      setFamilyMembers(response.data.familyMembers || []);
-    } catch (error) {
-      toast.error("Failed to fetch family members");
-    }
-  };
-
-  const searchUsers = async (searchEmail) => {
-    try {
-      const response = await api.get(`/users/search?email=${searchEmail}`);
-      setSearchResults(response.data.users || []);
-    } catch (error) {
-      toast.error("Failed to search users");
-    }
-  };
+  const {
+    familyMembers,
+    searchResults,
+    searchUsers,
+    addFamilyMember,
+    removeFamilyMember,
+    setSearchResults,
+  } = useFamily();
 
   const handleAddMember = async (userId) => {
-    try {
-      await api.post("/family", { familyMemberId: userId });
-      toast.success("Family member added successfully!");
+    const success = await addFamilyMember(userId);
+    if (success) {
       setEmail("");
       setSearchResults([]);
-      fetchFamilyMembers();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to add family member"
-      );
     }
   };
 
@@ -105,22 +83,34 @@ function Family() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {familyMembers.map((member) => (
           <div key={member._id} className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center space-x-4">
-              {member.profilePicture ? (
-                <img
-                  src={`http://localhost:3001${member.profilePicture}`}
-                  alt={member.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-gray-500" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                  {member.profilePicture ? (
+                    <img
+                      src={`http://localhost:3001${member.profilePicture}`}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                      <User className="w-6 h-6 text-primary" />
+                    </div>
+                  )}
                 </div>
-              )}
-              <div>
-                <h3 className="font-semibold">{member.name}</h3>
-                <p className="text-gray-600 text-sm">{member.email}</p>
+                <div>
+                  <p className="font-medium">{member.name}</p>
+                  <p className="text-sm text-gray-600">{member.email}</p>
+                </div>
               </div>
+
+              <button
+                onClick={() => removeFamilyMember(member._id)}
+                className="text-red-500 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                title="Remove family member"
+              >
+                <UserMinus className="w-5 h-5" />
+              </button>
             </div>
           </div>
         ))}

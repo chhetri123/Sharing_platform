@@ -1,68 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Calendar, Users } from "lucide-react";
-import toast from "react-hot-toast";
-import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
-
+import { useEvents } from "../context/EventContext";
+import EventCard from "../components/events/EventCard";
+import { useEffect } from "react";
 function Events() {
-  const [events, setEvents] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: "",
     date: "",
     description: "",
   });
-  const [unjoinedEvents, setUnjoinedEvents] = useState([]);
+
   const navigate = useNavigate();
+  const {
+    events,
+    unjoinedEvents,
+    createEvent,
+    joinEvent,
+    fetchEvents,
+    fetchUnjoinedEvents,
+  } = useEvents();
 
   useEffect(() => {
     fetchEvents();
     fetchUnjoinedEvents();
   }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const response = await api.get("/events");
-      setEvents(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch events");
-    }
-  };
-
-  const fetchUnjoinedEvents = async () => {
-    try {
-      const response = await api.get("/events/unjoined-family");
-      setUnjoinedEvents(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch unjoined events");
-    }
-  };
-
   const handleCreateEvent = async (e) => {
     e.preventDefault();
-    try {
-      await api.post("/events", newEvent);
-      toast.success("Event created successfully!");
+    const success = await createEvent(newEvent);
+    if (success) {
       setShowCreateModal(false);
-      fetchEvents();
-    } catch (error) {
-      toast.error("Failed to create event");
+      setNewEvent({ title: "", date: "", description: "" });
     }
   };
 
   const handleEventClick = (eventId) => {
     navigate(`/events/${eventId}`);
-  };
-
-  const handleJoinEvent = async (eventId) => {
-    try {
-      await api.post(`/events/${eventId}/join`);
-      toast.success("Successfully joined the event!");
-      fetchEvents();
-      fetchUnjoinedEvents();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to join event");
-    }
   };
 
   return (
@@ -83,21 +57,12 @@ function Events() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {events.map((event) => (
-          <div
+          <EventCard
             key={event._id}
-            onClick={() => handleEventClick(event._id)}
-            className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-          >
-            <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
-            <p className="text-gray-600 mb-2">
-              {new Date(event.date).toLocaleDateString()}
-            </p>
-            <p className="text-gray-700 mb-4">{event.description}</p>
-            <div className="flex items-center text-sm text-gray-500">
-              <Users className="w-4 h-4 mr-1" />
-              {event.participants.length} participants
-            </div>
-          </div>
+            event={event}
+            onClick={handleEventClick}
+            variant="joined"
+          />
         ))}
       </div>
 
@@ -109,34 +74,12 @@ function Events() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {unjoinedEvents.map((event) => (
-              <div
+              <EventCard
                 key={event._id}
-                className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:border-primary/20 transition-colors"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-semibold">{event.title}</h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleJoinEvent(event._id);
-                    }}
-                    className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-colors"
-                  >
-                    Join Event
-                  </button>
-                </div>
-                <p className="text-gray-600 mb-2 flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {new Date(event.date).toLocaleDateString()}
-                </p>
-                <p className="text-gray-700 mb-4">{event.description}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
-                    {event.participants.length} participants
-                  </div>
-                </div>
-              </div>
+                event={event}
+                onJoin={joinEvent}
+                variant="unjoined"
+              />
             ))}
           </div>
         </>

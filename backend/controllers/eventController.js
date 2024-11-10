@@ -137,7 +137,7 @@ const eventController = {
 
       // Check if user is creator or participant
       const isParticipant = event.participants.some(
-        (p) => p._id.toString() === userId
+        (p) => p._id.toString() === userId.toString()
       );
       const isCreator = event.creator._id.toString() === userId;
 
@@ -166,7 +166,6 @@ const eventController = {
   getUnjoinedFamilyEvents: async (req, res) => {
     try {
       // Get the current user with their family members
-      console.log(req.user.userId);
       const currentUser = await User.findById(req.user.userId);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
