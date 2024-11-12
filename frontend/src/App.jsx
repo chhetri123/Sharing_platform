@@ -9,7 +9,7 @@ import EventDetails from "./pages/EventDetails";
 import Photos from "./pages/Photos";
 import Family from "./pages/Family";
 import Profile from "./pages/Profile";
-import { Navigate, Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 function AppContent() {
   const { isAuthenticated } = useAuth();

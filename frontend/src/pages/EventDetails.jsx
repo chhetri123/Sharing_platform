@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { MessageSquare, Send, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../utils/api";
-import io from "socket.io-client";
+import { useSocket } from "../context/SocketContext";
 import { useEvents } from "../context/EventContext";
 
 function EventDetails() {
@@ -11,31 +11,24 @@ function EventDetails() {
   const { event, fetchEventDetails } = useEvents();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [socket, setSocket] = useState(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
     fetchEventDetails(id);
     fetchMessages();
-    // Socket.io setup
-    const newSocket = io("http://localhost:3001", {
-      auth: {
-        token: localStorage.getItem("token"),
-      },
-    });
 
-    newSocket.on("connect", () => {
-      console.log("Connected to socket");
-      newSocket.emit("join-event", id);
-    });
+    if (socket) {
+      socket.emit("join-event", id);
 
-    newSocket.on("new-message", (message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+      socket.on("new-message", (message) => {
+        setMessages((prev) => [...prev, message]);
+      });
 
-    setSocket(newSocket);
-
-    return () => newSocket.close();
-  }, [id]);
+      return () => {
+        socket.off("new-message");
+      };
+    }
+  }, [socket, id]);
 
   const fetchMessages = async () => {
     try {

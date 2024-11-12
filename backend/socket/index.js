@@ -1,5 +1,6 @@
 const socketIO = require("socket.io");
 const messageHandlers = require("./handlers/messageHandlers");
+const notificationHandlers = require("./handlers/notificationHandlers");
 const jwt = require("jsonwebtoken");
 
 function initializeSocket(server) {
@@ -34,6 +35,9 @@ function initializeSocket(server) {
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.user.userId}`);
 
+    // Join user to their personal room
+    socket.join(`user:${socket.user.userId}`);
+
     // Join user to their specific rooms
     socket.on("join-event", (eventId) => {
       socket.join(`event:${eventId}`);
@@ -42,7 +46,8 @@ function initializeSocket(server) {
 
     // Handle messages
     messageHandlers(io, socket);
-
+    // Add notification handlers
+    notificationHandlers(io, socket);
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.user.userId}`);
     });

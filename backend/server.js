@@ -36,6 +36,7 @@ app.use("/api/family", require("./routes/family"));
 app.use("/api/photos", require("./routes/photos"));
 app.use("/api/users", require("./routes/user"));
 app.use("/api/profile", require("./routes/profile"));
+app.use("/api/notifications", require("./routes/notifications"));
 
 // Make io accessible to routes
 app.set("io", io);

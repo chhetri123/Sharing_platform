@@ -1,12 +1,19 @@
 import { Calendar, Users, User } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useSocket } from "../../context/SocketContext";
 
 function EventCard({ event, onJoin, onClick, variant = "joined" }) {
   const isJoined = variant === "joined";
+  const { socket } = useSocket();
 
-  const handleJoinClick = (e) => {
+  const handleJoinClick = async (e) => {
     e.stopPropagation();
-    onJoin(event._id);
+    const success = await onJoin(event._id);
+    if (success) {
+      socket.emit("event-joined", {
+        eventId: event._id,
+        creatorId: event.creator._id,
+      });
+    }
   };
 
   return (

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Users, UserPlus, UserMinus, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useFamily } from "../context/FamilyContext";
+import { useSocket } from "../context/SocketContext";
+import toast from "react-hot-toast";
 
 function Family() {
   const [email, setEmail] = useState("");
@@ -9,17 +11,16 @@ function Family() {
     familyMembers,
     searchResults,
     searchUsers,
-    addFamilyMember,
     removeFamilyMember,
     setSearchResults,
   } = useFamily();
+  const { socket } = useSocket();
 
   const handleAddMember = async (userId) => {
-    const success = await addFamilyMember(userId);
-    if (success) {
-      setEmail("");
-      setSearchResults([]);
-    }
+    socket.emit("send-family-request", { recipientId: userId });
+    setEmail("");
+    setSearchResults([]);
+    toast.success("Family request sent!");
   };
 
   return (
