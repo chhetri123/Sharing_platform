@@ -18,6 +18,7 @@ export function SocketProvider({ children }) {
         auth: {
           token: localStorage.getItem("token"),
         },
+        transports: ["websocket", "polling"],
       });
 
       // Set up event listeners
