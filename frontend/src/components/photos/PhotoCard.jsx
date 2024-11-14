@@ -64,7 +64,7 @@ function PhotoCard({ photo }) {
         {/* Main Content */}
         <div className="relative aspect-[4/3]">
           <img
-            src={`http://localhost:3001${photo.imageUrl}`}
+            src={photo.imageUrl}
             alt={photo.description}
             className="w-full h-full object-cover"
           />
@@ -78,7 +78,7 @@ function PhotoCard({ photo }) {
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
                     {photo.userId?.profilePicture ? (
                       <img
-                        src={`http://localhost:3001${photo.userId.profilePicture}`}
+                        src={` ${photo.userId.profilePicture}`}
                         alt={photo.userId.name}
                         className="w-full h-full object-cover"
                       />
@@ -139,7 +139,7 @@ function PhotoCard({ photo }) {
         >
           <div className="relative max-w-5xl max-h-[90vh]">
             <img
-              src={`http://localhost:3001${photo.imageUrl}`}
+              src={` ${photo.imageUrl}`}
               alt={photo.description}
               className="w-full h-full object-contain"
             />

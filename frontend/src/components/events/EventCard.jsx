@@ -51,7 +51,7 @@ function EventCard({ event, onJoin, onClick, variant = "joined" }) {
           <div className="w-8 h-8 rounded-full overflow-hidden mr-2">
             {event.creator?.profilePicture ? (
               <img
-                src={`http://localhost:3001${event.creator.profilePicture}`}
+                src={`${event.creator.profilePicture}`}
                 alt={event.creator.name}
                 className="w-full h-full object-cover"
               />
@@ -74,7 +74,7 @@ function EventCard({ event, onJoin, onClick, variant = "joined" }) {
                 >
                   {participant.profilePicture ? (
                     <img
-                      src={`http://localhost:3001${participant.profilePicture}`}
+                      src={` ${participant.profilePicture}`}
                       alt={participant.name}
                       className="w-full h-full object-cover"
                     />

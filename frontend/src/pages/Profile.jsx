@@ -48,10 +48,7 @@ function Profile() {
               <div className="w-32 h-32 rounded-full overflow-hidden">
                 {previewUrl || user?.profilePicture ? (
                   <img
-                    src={
-                      previewUrl ||
-                      `http://localhost:3001${user.profilePicture}`
-                    }
+                    src={previewUrl || user.profilePicture}
                     alt={user.name}
                     className="w-full h-full object-cover"
                   />

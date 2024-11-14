@@ -1,7 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
 
 const FamilyContext = createContext();
 
@@ -9,10 +8,6 @@ export function FamilyProvider({ children }) {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchFamilyMembers();
-  }, []);
 
   const fetchFamilyMembers = async () => {
     try {
@@ -74,7 +69,6 @@ export function FamilyProvider({ children }) {
         searchUsers,
         addFamilyMember,
         removeFamilyMember,
-        setSearchResults,
       }}
     >
       {children}

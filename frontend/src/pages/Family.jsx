@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, UserPlus, UserMinus, User } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { useFamily } from "../context/FamilyContext";
 import { useSocket } from "../context/SocketContext";
 import toast from "react-hot-toast";
@@ -12,14 +11,29 @@ function Family() {
     searchResults,
     searchUsers,
     removeFamilyMember,
-    setSearchResults,
+    fetchFamilyMembers,
   } = useFamily();
   const { socket } = useSocket();
+
+  useEffect(() => {
+    let handler;
+    if (email) {
+      handler = setTimeout(() => {
+        searchUsers(email);
+      }, 300);
+    }
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [email]);
+
+  useEffect(() => {
+    fetchFamilyMembers();
+  }, []);
 
   const handleAddMember = async (userId) => {
     socket.emit("send-family-request", { recipientId: userId });
     setEmail("");
-    setSearchResults([]);
     toast.success("Family request sent!");
   };
 
@@ -35,10 +49,7 @@ function Family() {
           <input
             type="email"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (e.target.value) searchUsers(e.target.value);
-            }}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Search family member by email"
             className="flex-1 p-2 border rounded-md"
           />
@@ -54,7 +65,7 @@ function Family() {
                 <div className="flex items-center space-x-3">
                   {user.profilePicture ? (
                     <img
-                      src={`http://localhost:3001${user.profilePicture}`}
+                      src={user.profilePicture}
                       alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
                     />
@@ -89,7 +100,7 @@ function Family() {
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
                   {member.profilePicture ? (
                     <img
-                      src={`http://localhost:3001${member.profilePicture}`}
+                      src={` ${member.profilePicture}`}
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { MessageSquare, Send, Users } from "lucide-react";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ function EventDetails() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const { socket } = useSocket();
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     fetchEventDetails(id);
@@ -51,6 +52,12 @@ function EventDetails() {
     setNewMessage("");
   };
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   if (!event) return <div>Loading...</div>;
   return (
     <div className="max-w-4xl mx-auto">
@@ -81,7 +88,7 @@ function EventDetails() {
               <div className="flex-shrink-0">
                 {message.sender.profilePicture ? (
                   <img
-                    src={`http://localhost:3001${message.sender.profilePicture}`}
+                    src={` ${message.sender.profilePicture}`}
                     alt=""
                     className="w-8 h-8 rounded-full"
                   />
@@ -98,6 +105,7 @@ function EventDetails() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         <form onSubmit={handleSendMessage} className="flex space-x-2">

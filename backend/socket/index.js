@@ -16,13 +16,13 @@ function initializeSocket(server) {
     try {
       const token =
         socket?.handshake["headers"]?.token || socket?.handshake?.auth?.token;
-      console.log(token);
+
       if (!token) {
         return next(new Error("Authentication error"));
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decoded);
+
       socket.user = decoded;
 
       next();
@@ -33,15 +33,12 @@ function initializeSocket(server) {
 
   // Handle socket connections
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.user.userId}`);
-
     // Join user to their personal room
     socket.join(`user:${socket.user.userId}`);
 
     // Join user to their specific rooms
     socket.on("join-event", (eventId) => {
       socket.join(`event:${eventId}`);
-      console.log(`User ${socket.user.userId} joined event ${eventId}`);
     });
 
     // Handle messages

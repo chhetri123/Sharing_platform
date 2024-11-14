@@ -7,6 +7,18 @@ function notificationHandlers(io, socket) {
     try {
       const { recipientId } = data;
 
+      // Check if a family request already exists
+      const existingRequest = await Notification.findOne({
+        recipient: recipientId,
+        sender: socket.user.userId,
+        type: "FAMILY_REQUEST",
+      });
+
+      if (existingRequest) {
+        socket.emit("error", { message: "Family request already sent" });
+        return;
+      }
+
       // Create notification
       const notification = new Notification({
         recipient: recipientId,

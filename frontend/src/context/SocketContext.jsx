@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
+import toast from "react-hot-toast";
 
 const SocketContext = createContext();
 
@@ -13,7 +14,7 @@ export function SocketProvider({ children }) {
 
     if (isAuthenticated) {
       // Create socket connection
-      newSocket = io("http://localhost:3001", {
+      newSocket = io(import.meta.env.VITE_API_URL, {
         auth: {
           token: localStorage.getItem("token"),
         },
@@ -26,6 +27,9 @@ export function SocketProvider({ children }) {
 
       newSocket.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
+      });
+      newSocket.on("error", (error) => {
+        toast.error(error.message);
       });
 
       setSocket(newSocket);

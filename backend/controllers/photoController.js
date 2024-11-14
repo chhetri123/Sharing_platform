@@ -1,7 +1,13 @@
 const Photo = require("../models/Photo");
 const User = require("../models/User");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const photoController = {
   uploadPhoto: async (req, res) => {
@@ -10,15 +16,29 @@ const photoController = {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const fileUrl = `/uploads/${req.file.filename}`;
-      const photo = new Photo({
-        userId: req.user.userId,
-        imageUrl: fileUrl,
-        description: req.body.description || "",
-      });
+      // Create a stream to upload the file
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "uploads" },
+        async (error, result) => {
+          if (error) {
+            return res.status(500).json({
+              message: "Upload to Cloudinary failed",
+              error: error.message,
+            });
+          }
 
-      await photo.save();
-      res.status(201).json(photo);
+          const photo = new Photo({
+            userId: req.user.userId,
+            imageUrl: result.secure_url, // Use the secure URL from Cloudinary
+            description: req.body.description || "",
+          });
+
+          await photo.save();
+          res.status(201).json(photo);
+        }
+      );
+
+      stream.end(req.file.buffer); // Send the file buffer to Cloudinary
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -91,13 +111,9 @@ const photoController = {
         });
       }
 
-      // Delete the file from uploads folder
-      const filePath = path.join(__dirname, "..", "public", photo.imageUrl);
-      if (fs.existsSync(filePath)) {
-        fs.unlink(filePath, (err) => {
-          if (err) console.error("Error deleting file:", err);
-        });
-      }
+      // Delete the file from Cloudinary
+      const publicId = photo.imageUrl.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
 
       await photo.deleteOne();
       res.json({ message: "Photo deleted successfully" });

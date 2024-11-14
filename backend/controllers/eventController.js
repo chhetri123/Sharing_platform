@@ -56,8 +56,6 @@ const eventController = {
       const { eventId } = req.params;
       const userId = req.user.userId;
 
-      console.log("Attempting to join event:", { eventId, userId });
-
       // Find the event
       const event = await Event.findById(eventId);
       if (!event) {
@@ -75,9 +73,6 @@ const eventController = {
         User.findById(userId),
       ]);
 
-      console.log("Creator family members:", creator.familyMembers);
-      console.log("Joining user ID:", userId);
-
       // Check if the user is either:
       // 1. The creator
       // 2. In creator's family members
@@ -87,12 +82,6 @@ const eventController = {
       const isCreatorInUserFamily = joiningUser.familyMembers.includes(
         event.creator.toString()
       );
-
-      console.log("Access checks:", {
-        isCreator,
-        isInCreatorFamily,
-        isCreatorInUserFamily,
-      });
 
       if (!isCreator && !isInCreatorFamily && !isCreatorInUserFamily) {
         return res.status(403).json({
@@ -123,7 +112,6 @@ const eventController = {
   getEventDetails: async (req, res) => {
     try {
       const { eventId } = req.params;
-      console.log(eventId);
       const userId = req.user.userId;
 
       // Find event and populate creator and participants

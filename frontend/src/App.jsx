@@ -10,6 +10,7 @@ import Photos from "./pages/Photos";
 import Family from "./pages/Family";
 import Profile from "./pages/Profile";
 import { Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
@@ -44,6 +45,10 @@ function AppContent() {
           <Route
             path="/family"
             element={<ProtectedRoute component={Family} />}
+          />
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute component={Dashboard} />}
           />
           <Route
             path="/profile"

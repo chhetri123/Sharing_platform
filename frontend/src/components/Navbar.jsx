@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import { Calendar, Users, Image, LogOut, User } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  Image,
+  LogOut,
+  User,
+  LayoutDashboard,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "./notifications/NotificationDropdown";
@@ -25,7 +32,6 @@ function Navbar() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    console.log(user);
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -63,6 +69,13 @@ function Navbar() {
               <Image className="w-5 h-5 mr-1" />
               Photos
             </Link>
+            <Link
+              to="/dashboard"
+              className="flex items-center text-gray-700 hover:text-primary"
+            >
+              <LayoutDashboard className="w-5 h-5 mr-1" />
+              Dashboard
+            </Link>
           </div>
 
           {/* Right side - User menu and notifications */}
@@ -83,7 +96,7 @@ function Navbar() {
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
                     {user?.profilePicture ? (
                       <img
-                        src={`http://localhost:3001${user.profilePicture}`}
+                        src={user.profilePicture}
                         alt={user.name}
                         className="w-full h-full object-cover"
                       />

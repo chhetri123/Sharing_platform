@@ -5,7 +5,13 @@ import { formatDistanceToNow } from "date-fns";
 function NotificationDropdown({ notifications = [], onAccept, onReject }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const [localNotifications, setLocalNotifications] = useState(notifications);
+
+  useEffect(() => {
+    setLocalNotifications(notifications);
+  }, [notifications]);
+
+  const unreadCount = localNotifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -18,10 +24,34 @@ function NotificationDropdown({ notifications = [], onAccept, onReject }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleDropdownToggle = () => {
+    if (!isOpen) {
+      // Mark all notifications as read when the dropdown is opened
+      setLocalNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    }
+    setIsOpen(!isOpen);
+  };
+
+  const handleAccept = (notificationId) => {
+    onAccept(notificationId);
+    // Mark the notification as read in local state
+    setLocalNotifications((prev) =>
+      prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n))
+    );
+  };
+
+  const handleReject = (notificationId) => {
+    onReject(notificationId);
+    // Mark the notification as read in local state
+    setLocalNotifications((prev) =>
+      prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n))
+    );
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleDropdownToggle}
         className="relative p-2 text-gray-600 hover:text-primary focus:outline-none"
       >
         <Bell className="w-6 h-6" />
@@ -41,12 +71,12 @@ function NotificationDropdown({ notifications = [], onAccept, onReject }) {
               </h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {localNotifications.length === 0 ? (
                 <div className="px-4 py-3 text-sm text-gray-500 text-center">
                   No notifications
                 </div>
               ) : (
-                notifications.map((notification) => (
+                localNotifications.map((notification) => (
                   <div
                     key={notification._id}
                     className={`px-4 py-3 hover:bg-gray-50 ${
@@ -79,13 +109,13 @@ function NotificationDropdown({ notifications = [], onAccept, onReject }) {
                       notification.status === "PENDING" && (
                         <div className="mt-2 flex space-x-2">
                           <button
-                            onClick={() => onAccept(notification._id)}
+                            onClick={() => handleAccept(notification._id)}
                             className="px-3 py-1 text-xs font-medium text-white bg-primary rounded hover:bg-primary/90"
                           >
                             Accept
                           </button>
                           <button
-                            onClick={() => onReject(notification._id)}
+                            onClick={() => handleReject(notification._id)}
                             className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
                           >
                             Decline
