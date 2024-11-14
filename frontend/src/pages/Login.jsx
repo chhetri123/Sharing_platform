@@ -16,7 +16,7 @@ function Login() {
       const response = await api.post("/auth/login", formData);
       localStorage.setItem("token", response.data.token);
       toast.success("Login successful!");
-      window.location.href = "/events";
+      window.location.href = "/";
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     }
