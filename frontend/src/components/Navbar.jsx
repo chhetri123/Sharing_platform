@@ -6,6 +6,8 @@ import {
   LogOut,
   User,
   LayoutDashboard,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
@@ -15,6 +17,7 @@ import { useNotifications } from "../context/NotificationContext";
 function Navbar() {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
   const { notifications, respondToFamilyRequest } = useNotifications();
 
@@ -44,10 +47,10 @@ function Navbar() {
 
   return (
     <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex justify-between items-center">
           {/* Navigation Links */}
-          <div className="flex space-x-8">
+          <div className="hidden sm:flex space-x-8">
             <Link
               to="/events"
               className="flex items-center text-gray-700 hover:text-primary"
@@ -78,6 +81,20 @@ function Navbar() {
             </Link>
           </div>
 
+          {/* Mobile Menu Button */}
+          <div className="sm:hidden">
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="text-gray-700 hover:text-primary focus:outline-none"
+            >
+              {showMobileMenu ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+
           {/* Right side - User menu and notifications */}
           <div className="flex items-center space-x-4">
             <NotificationDropdown
@@ -106,33 +123,77 @@ function Navbar() {
                       </div>
                     )}
                   </div>
-                  <span className="font-medium">{user?.name}</span>
+                  <span className="font-medium text-sm sm:text-base">
+                    {user?.name}
+                  </span>
                 </div>
               </button>
 
               {/* Dropdown Menu */}
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
                   <Link
                     to="/profile"
-                    className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     onClick={() => setShowDropdown(false)}
                   >
-                    <User className="w-4 h-4 mr-2" />
-                    Profile Settings
+                    <div className="flex items-center">
+                      <User className="w-4 h-4 mr-2" />
+                      <span>Profile Settings</span>
+                    </div>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors flex items-center"
                   >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    <div className="flex items-center">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      <span>Logout</span>
+                    </div>
                   </button>
                 </div>
               )}
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="sm:hidden mt-4 space-y-4">
+            <Link
+              to="/events"
+              className="flex items-center text-gray-700 hover:text-primary"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              Events
+            </Link>
+            <Link
+              to="/family"
+              className="flex items-center text-gray-700 hover:text-primary"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <Users className="w-5 h-5 mr-2" />
+              Family
+            </Link>
+            <Link
+              to="/photos"
+              className="flex items-center text-gray-700 hover:text-primary"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <Image className="w-5 h-5 mr-2" />
+              Photos
+            </Link>
+            <Link
+              to="/dashboard"
+              className="flex items-center text-gray-700 hover:text-primary"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <LayoutDashboard className="w-5 h-5 mr-2" />
+              Dashboard
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

@@ -13,6 +13,7 @@ import {
   PointElement,
 } from "chart.js";
 import PhotosDashboard from "../components/PhotosDashboard";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 // Register the necessary components
 ChartJS.register(
@@ -80,14 +81,21 @@ function Dashboard() {
 
   // Prepare chat statistics data for chart
   const messageStatsData = {
-    labels: dashboardData.messageStats.map(
-      (stat) => `${stat.userName} - ${stat.eventName} - ${stat.date}`
-    ),
+    labels: dashboardData.messageStats.map((stat) => stat.userName),
     datasets: [
       {
         label: "Messages Sent",
         data: dashboardData.messageStats.map((stat) => stat.count),
         backgroundColor: "rgba(255, 99, 132, 0.6)",
+        datalabels: {
+          display: true,
+          formatter: (value, context) => {
+            const eventName =
+              dashboardData.messageStats[context.dataIndex].eventName;
+            return eventName; // Display event name inside the bar
+          },
+          color: "black", // Change color of the text if needed
+        },
       },
     ],
   };
@@ -115,13 +123,20 @@ function Dashboard() {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4">Message Statistics</h2>
+        <h2 className="text-xl font-bold mb-4">Message Statistics per Event</h2>
         <Bar
           data={messageStatsData}
           options={{
             responsive: true,
-            plugins: { legend: { position: "top" } },
+            plugins: {
+              legend: { position: "top" },
+              datalabels: {
+                anchor: "end",
+                align: "end",
+              },
+            },
           }}
+          plugins={[ChartDataLabels]}
         />
       </div>
       <div className="bg-white  p-6 rounded-lg shadow-md">
