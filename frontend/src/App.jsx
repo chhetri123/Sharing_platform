@@ -7,6 +7,7 @@ import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 import Photos from "./pages/Photos";
 import Family from "./pages/Family";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -45,6 +46,12 @@ function App() {
             <Route
               path="/family"
               element={isAuthenticated ? <Family /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/dashboard"
+              element={
+                isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
+              }
             />
             <Route path="/" element={<Navigate to="/events" />} />
           </Routes>

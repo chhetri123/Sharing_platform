@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Calendar, Users, Image, LogOut } from "lucide-react";
+import { Calendar, Users, Image, LogOut, LayoutDashboard } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -34,6 +34,13 @@ function Navbar() {
             >
               <Image className="w-5 h-5 mr-1" />
               Photos
+            </Link>
+            <Link
+              to="/dashboard"
+              className="flex items-center text-gray-700 hover:text-primary"
+            >
+              <LayoutDashboard className="w-5 h-5 mr-1" />
+              Dashboard
             </Link>
           </div>
           <button
